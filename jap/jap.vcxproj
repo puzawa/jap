@@ -106,10 +106,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,24 +124,28 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="driver_loader.c" />
+    <ClCompile Include="driver\driver_loader.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="utils\logging\log.c" />
+    <ClCompile Include="utils\rxi\log.c" />
     <ClCompile Include="utils\service.c" />
     <ClCompile Include="utils\utils.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="driver_loader.h" />
-    <ClInclude Include="utils\logging\log.h" />
+    <ClInclude Include="driver\driver_loader.h" />
+    <ClInclude Include="driver\driver_resource.h" />
+    <ClInclude Include="driver\driver_state.h" />
+    <ClInclude Include="utils\rxi\log.h" />
     <ClInclude Include="utils\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

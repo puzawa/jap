@@ -6,6 +6,8 @@
  * under the terms of the MIT license. See `log.c` for details.
  */
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #ifndef LOG_H
 #define LOG_H
 

@@ -18,7 +18,7 @@
     <ClCompile Include="main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="driver_loader.c">
+    <ClCompile Include="driver\driver_loader.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="utils\utils.c">
@@ -27,18 +27,24 @@
     <ClCompile Include="utils\service.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="utils\logging\log.c">
+    <ClCompile Include="utils\rxi\log.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="driver_loader.h">
+    <ClInclude Include="driver\driver_loader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="utils\utils.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="utils\logging\log.h">
+    <ClInclude Include="utils\rxi\log.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="driver\driver_resource.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="driver\driver_state.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
