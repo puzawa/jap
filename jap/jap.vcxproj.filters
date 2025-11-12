@@ -30,6 +30,9 @@
     <ClCompile Include="utils\rxi\log.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="driver\driver_connection.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver\driver_loader.h">
@@ -45,6 +48,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="driver\driver_state.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="driver\driver_connection.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
