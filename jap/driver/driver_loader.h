@@ -9,4 +9,4 @@
 #include <stdbool.h>
 
 bool CreateAndStartDriver(const DriverState* driverState);
-bool StopAndRemoveDriver(const DriverState* driverState);
+bool TryStopAndRemoveDriver(const DriverState* driverState);
