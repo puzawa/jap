@@ -71,7 +71,7 @@ bool PreInit(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, D
 		return false;
 	}
 
-	log_info("win32k base: %p\n", win32k);
+	log_info("win32k base: %p", win32k);
 
 	uintptr_t NtUserSetGestureConfig_u = GetProcAddress(w32mod, "NtUserSetGestureConfig");
 	if (!NtUserSetGestureConfig_u) {

@@ -41,6 +41,7 @@ BOOL WINAPI DllMain(
 	switch (fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
+		log_set_level(LOG_TRACE);
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
