@@ -145,6 +145,8 @@
     <ClCompile Include="utils\rxi\log.c" />
     <ClCompile Include="utils\service.c" />
     <ClCompile Include="utils\utils.c" />
+    <ClCompile Include="vuln\vuln.c" />
+    <ClCompile Include="vuln\vuln_init.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver\driver_interface.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="utils\ntdef.h" />
     <ClInclude Include="utils\rxi\log.h" />
     <ClInclude Include="utils\utils.h" />
+    <ClInclude Include="vuln\vuln.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
