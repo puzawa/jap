@@ -7,41 +7,35 @@ internal static class NativeMethods
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static extern bool eTryLoadVuln(string vuln_driver_path, string vuln_driver_name, out IntPtr pDriverState);
+    internal static extern bool eTryLoadVuln(string vulnDriverPath, string vulnDriverName, out IntPtr pDriverState);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]
     internal static extern bool eUnloadVuln(IntPtr driverState);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    internal static extern UIntPtr eGetKernelModuleAddress(string module_name);
+    internal static extern UIntPtr eGetKernelModuleAddress(string moduleName);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    internal static extern UIntPtr eGetKernelModuleExport(IntPtr driverState, ulong kernel_module_base, string function_name);
+    internal static extern UIntPtr eGetKernelModuleExport(IntPtr driverState, ulong kernelModuleBase, string functionName);
 }
 
 public sealed class DriverState : IDisposable
 {
     private IntPtr _nativePtr;
     private bool _disposed;
-    private readonly object _lock = new object();
+    private readonly object _lock = new();
 
-    private DriverState(IntPtr nativePtr)
+    private DriverState(IntPtr nativePtr) => _nativePtr = nativePtr;
+
+    public static DriverState? Create(string driverPath, string driverName)
     {
-        _nativePtr = nativePtr;
-    }
+        if (string.IsNullOrWhiteSpace(driverPath)) throw new ArgumentNullException(nameof(driverPath));
+        if (string.IsNullOrWhiteSpace(driverName)) throw new ArgumentNullException(nameof(driverName));
 
-    public static DriverState Create(string driverPath, string driverName)
-    {
-        if (string.IsNullOrEmpty(driverPath)) throw new ArgumentNullException(nameof(driverPath));
-        if (string.IsNullOrEmpty(driverName)) throw new ArgumentNullException(nameof(driverName));
-
-        if (NativeMethods.eTryLoadVuln(driverPath, driverName, out IntPtr ptr) && ptr != IntPtr.Zero)
-        {
-            return new DriverState(ptr);
-        }
-
-        return null;
+        return NativeMethods.eTryLoadVuln(driverPath, driverName, out var ptr) && ptr != IntPtr.Zero
+            ? new DriverState(ptr)
+            : null;
     }
 
     public IntPtr NativePointer
@@ -55,15 +49,15 @@ public sealed class DriverState : IDisposable
 
     public static UIntPtr GetKernelModuleAddress(string moduleName)
     {
-        if (string.IsNullOrEmpty(moduleName)) throw new ArgumentNullException(nameof(moduleName));
+        if (string.IsNullOrWhiteSpace(moduleName)) throw new ArgumentNullException(nameof(moduleName));
         return NativeMethods.eGetKernelModuleAddress(moduleName);
     }
-
 
     public UIntPtr GetKernelModuleExport(UIntPtr kernelModuleBase, string functionName)
     {
         ThrowIfDisposed();
-        if (string.IsNullOrEmpty(functionName)) throw new ArgumentNullException(nameof(functionName));
+        if (string.IsNullOrWhiteSpace(functionName)) throw new ArgumentNullException(nameof(functionName));
+
         return NativeMethods.eGetKernelModuleExport(_nativePtr, kernelModuleBase.ToUInt64(), functionName);
     }
 
@@ -71,26 +65,16 @@ public sealed class DriverState : IDisposable
     {
         lock (_lock)
         {
-            if (_disposed) return false;
-
-            if (_nativePtr == IntPtr.Zero)
-            {
-                _disposed = true;
-                return false;
-            }
+            if (_disposed || _nativePtr == IntPtr.Zero) return false;
 
             try
             {
-                bool result = NativeMethods.eUnloadVuln(_nativePtr);
-                _nativePtr = IntPtr.Zero;
-                _disposed = true;
-                return result;
+                return NativeMethods.eUnloadVuln(_nativePtr);
             }
-            catch
+            finally
             {
                 _nativePtr = IntPtr.Zero;
                 _disposed = true;
-                return false;
             }
         }
     }
@@ -102,39 +86,24 @@ public sealed class DriverState : IDisposable
 
     public void Dispose()
     {
-        Dispose(true);
+        lock (_lock)
+        {
+            if (!_disposed)
+            {
+                if (_nativePtr != IntPtr.Zero)
+                {
+                    try { NativeMethods.eUnloadVuln(_nativePtr); } catch { }
+                    _nativePtr = IntPtr.Zero;
+                }
+                _disposed = true;
+            }
+        }
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
-    {
-        lock (_lock)
-        {
-            if (_disposed) return;
-
-            if (_nativePtr != IntPtr.Zero)
-            {
-                try
-                {
-                    NativeMethods.eUnloadVuln(_nativePtr);
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    _nativePtr = IntPtr.Zero;
-                }
-            }
-
-            _disposed = true;
-        }
-    }
-    ~DriverState()
-    {
-        Dispose(false);
-    }
+    ~DriverState() => Dispose();
 }
+
 
 class Program
 {
@@ -154,6 +123,6 @@ class Program
 
             var exportAddr = driver.GetKernelModuleExport(baseAddr, "ExAllocatePoolWithTag");
             Console.WriteLine("export: 0x" + exportAddr.ToUInt64().ToString("X"));
-        } 
+        }
     }
 }
