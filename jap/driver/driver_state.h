@@ -8,6 +8,7 @@
 typedef struct {
 	bool file_created;
 	bool service_created;
+	bool vuln_fine;
 
 	HANDLE hDevice;
 

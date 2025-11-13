@@ -34,6 +34,8 @@ bool PreInit(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, D
 	if (!driverState)
 		return false;//????
 
+	memset(driverState, 0, sizeof(DriverState));
+
 	driverState->vuln_driver_name = vuln_driver_name;
 	driverState->vuln_driver_path = vuln_driver_path;
 
@@ -126,6 +128,8 @@ bool TryLoadVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_nam
 		return false;
 	}
 
+	//todo validation by test call
+	driverState->vuln_fine = true;
 	return true;
 }
 
