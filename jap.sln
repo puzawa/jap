@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jap", "jap\jap.vcxproj", "{7074357E-3209-49FB-B4B0-F2FDF47310B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A5AA5E22-05FD-4553-9E06-C0292DB637E0} = {A5AA5E22-05FD-4553-9E06-C0292DB637E0}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mapper", "mapper\mapper.csproj", "{9074EF1E-D74A-4FB7-A345-31301B03F90A}"
 EndProject
