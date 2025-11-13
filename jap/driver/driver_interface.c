@@ -138,3 +138,68 @@ uintptr_t FindPatternAtKernel(DriverState* driverState, uintptr_t dwAddress, uin
 	free(sectionData);
 	return result;
 }
+
+uintptr_t GetKernelModuleExport(DriverState* driverState, uint64_t kernel_module_base, const char* function_name)
+{
+	if (!kernel_module_base || !function_name)
+		return 0;
+
+	IMAGE_DOS_HEADER dos_header = { 0 };
+	IMAGE_NT_HEADERS64 nt_headers = { 0 };
+
+	if (!ReadMemory(driverState, (void*)kernel_module_base, &dos_header, sizeof(dos_header)) ||
+		dos_header.e_magic != IMAGE_DOS_SIGNATURE)
+		return 0;
+
+	if (!ReadMemory(driverState, (void*)(kernel_module_base + dos_header.e_lfanew), &nt_headers, sizeof(nt_headers)) ||
+		nt_headers.Signature != IMAGE_NT_SIGNATURE)
+		return 0;
+
+	const DWORD export_rva = nt_headers.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+	const DWORD export_size = nt_headers.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+
+	if (!export_rva || !export_size)
+		return 0;
+
+	PIMAGE_EXPORT_DIRECTORY export_data = (PIMAGE_EXPORT_DIRECTORY)VirtualAlloc(NULL, export_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if (!export_data)
+		return 0;
+
+	if (!ReadMemory(driverState, (void*)(kernel_module_base + export_rva), export_data, export_size)) {
+		VirtualFree(export_data, 0, MEM_RELEASE);
+		return 0;
+	}
+
+	uint64_t delta = (uint64_t)export_data - export_rva;
+
+	uint32_t* name_table = (uint32_t*)(export_data->AddressOfNames + delta);
+	uint16_t* ordinal_table = (uint16_t*)(export_data->AddressOfNameOrdinals + delta);
+	uint32_t* function_table = (uint32_t*)(export_data->AddressOfFunctions + delta);
+
+	for (DWORD i = 0; i < export_data->NumberOfNames; i++) {
+		char* current_function_name = (char*)(name_table[i] + delta);
+
+		if (_stricmp(current_function_name, function_name) == 0) {
+			uint16_t function_ordinal = ordinal_table[i];
+
+			if (function_table[function_ordinal] <= 0x1000) {
+				VirtualFree(export_data, 0, MEM_RELEASE);
+				return 0;
+			}
+
+			uint64_t function_address = kernel_module_base + function_table[function_ordinal];
+
+			if (function_address >= kernel_module_base + export_rva &&
+				function_address <= kernel_module_base + export_rva + export_size) {
+				VirtualFree(export_data, 0, MEM_RELEASE);
+				return 0;
+			}
+
+			VirtualFree(export_data, 0, MEM_RELEASE);
+			return function_address;
+		}
+	}
+
+	VirtualFree(export_data, 0, MEM_RELEASE);
+	return 0;
+}
