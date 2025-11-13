@@ -1,5 +1,4 @@
 #pragma once
-
 #include "driver_state.h"
 
 #include <windows.h>

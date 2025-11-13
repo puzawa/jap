@@ -8,7 +8,11 @@ int main() {
 	const wchar_t* vuln_driver_path = L"C:\\temp\\temp.sys";
 	const wchar_t* vuln_driver_name = L"tempdrv";
 
-	TryInitVuln(vuln_driver_path, vuln_driver_name);
+	DriverState* driverState = NULL;
+	if (!TryLoadVuln(vuln_driver_path, vuln_driver_name, &driverState))
+		return 1;
+
+	UnloadVuln(driverState);
 
 	return 0;
 }

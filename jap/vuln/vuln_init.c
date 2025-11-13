@@ -66,8 +66,15 @@ bool PreInit(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, D
 
 	log_info("win32k base: %p\n", win32k);
 
+	uintptr_t NtUserSetGestureConfig_u = GetProcAddress(w32mod, "NtUserSetGestureConfig");
+	if (!NtUserSetGestureConfig_u) {
+		log_error("failed to get GetProcAddress NtUserSetGestureConfig_u");
+		return false;
+	}
+
 	driverState->win32k_base = win32k;
 	driverState->NtUserSetGestureConfig_rva = NtUserSetGestureConfig_rva;
+	driverState->NtUserSetGestureConfig_u = NtUserSetGestureConfig_u;
 	*driverState_out = driverState;
 	return true;
 }
@@ -95,8 +102,8 @@ bool TryUpdateNtRef(DriverState* driverState) {
 	return true;
 }
 
-bool TryInitVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name) {
-	DriverState* driverState = NULL;
+bool TryLoadVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, DriverState** pDriverState) {
+	DriverState* driverState = *pDriverState;
 	if (!PreInit(vuln_driver_path, vuln_driver_name, &driverState)) {
 		log_error("preinit failed, aborting");
 		return false;
@@ -114,7 +121,12 @@ bool TryInitVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_nam
 		return false;
 	}
 
-
-	RemoveDriver(driverState);
 	return true;
+}
+
+bool UnloadVuln(DriverState* driverState) {
+	if (driverState) {
+		return RemoveDriver(driverState);
+	}
+	return false;
 }

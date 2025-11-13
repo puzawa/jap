@@ -14,6 +14,7 @@ typedef struct {
 	uintptr_t win32k_base;
 	int NtUserSetGestureConfig_rva;
 	uintptr_t NtUserSetGestureConfig_ref;
+	uintptr_t NtUserSetGestureConfig_u;
 
 	const wchar_t* vuln_driver_path;
 	const wchar_t* vuln_driver_name;
