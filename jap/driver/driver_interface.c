@@ -1,4 +1,4 @@
-#include "driver_connection.h"
+#include "driver_interface.h"
 #include "utils/utils.h"
 
 
@@ -102,4 +102,39 @@ bool WriteMemory(DriverState* driverState, uintptr_t address, const void* buffer
 	}
 
 	return true;
+}
+
+uintptr_t FindPatternAtKernel(DriverState* driverState, uintptr_t dwAddress, uintptr_t dwLen, BYTE* bMask, const char* szMask) {
+	if (!dwAddress) {
+		log_error("No module address to find pattern");
+		return 0;
+	}
+
+	if (dwLen > 1024ULL * 1024ULL * 1024ULL) { // > 1 GB
+		log_error("Can't find pattern, too big section");
+		return 0;
+	}
+
+	BYTE* sectionData = (BYTE*)malloc(dwLen);
+	if (!sectionData) {
+		log_error(L"Memory allocation failed");
+		return 0;
+	}
+
+	if (!ReadMemory(driverState, dwAddress, sectionData, dwLen)) {
+		log_error(L"Read failed in FindPatternAtKernel");
+		free(sectionData);
+		return 0;
+	}
+
+	uintptr_t result = FindPattern((uintptr_t)sectionData, dwLen, bMask, szMask);
+	if (result == 0) {
+		log_error(L"Can't find pattern");
+		free(sectionData);
+		return 0;
+	}
+
+	result = dwAddress - (uintptr_t)sectionData + result;
+	free(sectionData);
+	return result;
 }

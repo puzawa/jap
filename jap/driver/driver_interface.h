@@ -11,3 +11,5 @@ bool CloseDriverConnection(DriverState* driverState);
 
 bool ReadMemory(DriverState* driverState, uintptr_t address, void* buffer, size_t size);
 bool WriteMemory(DriverState* driverState, uintptr_t address, const void* buffer, size_t size);
+
+uintptr_t FindPatternAtKernel(DriverState* driverState, uintptr_t dwAddress, uintptr_t dwLen, BYTE* bMask, const char* szMask);

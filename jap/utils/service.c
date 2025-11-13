@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "ntdef.h"
 
 #include <winreg.h>
 #include <wchar.h>
@@ -6,10 +7,6 @@
 #include <stdlib.h>
 
 #pragma comment(lib, "ntdll.lib")
-
-typedef NTSTATUS(NTAPI* RtlAdjustPrivilege_t)(ULONG, BOOLEAN, BOOLEAN, PBOOLEAN);
-typedef NTSTATUS(NTAPI* NtLoadDriver_t)(PUNICODE_STRING);
-typedef NTSTATUS(NTAPI* NtUnloadDriver_t)(PUNICODE_STRING);
 
 
 bool RegisterAndStartService(const wchar_t* driver_name, const wchar_t* driver_path) {

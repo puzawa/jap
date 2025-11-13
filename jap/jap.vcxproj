@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="driver\driver_connection.c" />
+    <ClCompile Include="driver\driver_interface.c" />
     <ClCompile Include="driver\driver_loader.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="utils\rxi\log.c" />
@@ -147,10 +147,11 @@
     <ClCompile Include="utils\utils.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="driver\driver_connection.h" />
+    <ClInclude Include="driver\driver_interface.h" />
     <ClInclude Include="driver\driver_loader.h" />
     <ClInclude Include="driver\driver_resource.h" />
     <ClInclude Include="driver\driver_state.h" />
+    <ClInclude Include="utils\ntdef.h" />
     <ClInclude Include="utils\rxi\log.h" />
     <ClInclude Include="utils\utils.h" />
   </ItemGroup>
