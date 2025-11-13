@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
+    <ClCompile Include="app.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="driver\driver_loader.c">
@@ -37,6 +37,9 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="vuln\vuln.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="dll.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
