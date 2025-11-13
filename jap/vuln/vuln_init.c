@@ -13,12 +13,17 @@ bool RemoveDriver(DriverState* driverState) {
 bool InitDriver(DriverState* driverState) {
 	if (!CreateAndStartDriver(driverState)) {
 		log_error("failed to create and start driver");
-		return false;
+		//return false;
 	}
 	if (!OpenDriverConnection(driverState)) {
 		log_error("failed to open driver connection");
 		RemoveDriver(driverState);
 		return false;
+	}
+	else {
+		//if connect succesful, force try to unload
+		driverState->file_created = true;
+		driverState->service_created = true;
 	}
 	return true;
 }
@@ -103,12 +108,12 @@ bool TryUpdateNtRef(DriverState* driverState) {
 }
 
 bool TryLoadVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, DriverState** pDriverState) {
-	DriverState* driverState = *pDriverState;
-	if (!PreInit(vuln_driver_path, vuln_driver_name, &driverState)) {
+	if (!PreInit(vuln_driver_path, vuln_driver_name, pDriverState)) {
 		log_error("preinit failed, aborting");
 		return false;
 	}
 
+	DriverState* driverState = *pDriverState;
 	if (!InitDriver(driverState)) {
 		log_error("failed to init driver, aborting");
 		return false;

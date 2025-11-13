@@ -13,6 +13,13 @@ int main() {
 	if (!TryLoadVuln(vuln_driver_path, vuln_driver_name, &driverState))
 		return 1;
 
+	uintptr_t ntos = GetKernelModuleAddress("ntoskrnl.exe");
+	if (ntos) {
+		log_info("ntos: %p", ntos);
+		uintptr_t test_export = GetKernelModuleExport(driverState, ntos, "ExAllocatePoolWithTag");
+		log_info("test_export: %p", test_export);
+
+	}
 	UnloadVuln(driverState);
 
 	return 0;

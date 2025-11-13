@@ -44,6 +44,8 @@ bool TryStopAndRemoveDriver(DriverState* driverState) {
 		else
 			log_error("failed to stop vuln driver");
 	}
+	else
+		log_warn("trying to stop not started service");
 
 	if (driverState->file_created)
 	{
@@ -55,6 +57,9 @@ bool TryStopAndRemoveDriver(DriverState* driverState) {
 		else
 			log_error("failed to removed vuln driver file");
 	}
+	else
+		log_warn("trying to remove not created file");
+
 
 	return true;
 }
