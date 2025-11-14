@@ -12,18 +12,20 @@ public sealed class VulnManager : IDisposable
     {
         if (string.IsNullOrWhiteSpace(driverPath)) throw new ArgumentNullException(nameof(driverPath));
         if (string.IsNullOrWhiteSpace(driverName)) throw new ArgumentNullException(nameof(driverName));
-        string fullDriverPath = Path.Combine(driverPath, driverName);
 
-        return NativeMethods.eTryLoadVuln(fullDriverPath, driverName, out var ptr) && ptr != IntPtr.Zero
+        return NativeMethods.eTryLoadVuln(driverPath, driverName, out var ptr) && ptr != IntPtr.Zero
             ? new VulnManager(ptr)
             : null;
     }
 
     public static VulnManager? EasyCreate()
     {
-        string driverPath = Environment.ProcessPath;
+        string driverPath = Path.GetDirectoryName(Environment.ProcessPath);
         string driverName = "vuln";
-        return Create(driverPath, driverName);
+        string fullDriverPath = Path.Combine(driverPath, driverName);
+
+        Console.WriteLine("Dropping driver at: " + fullDriverPath);
+        return Create(fullDriverPath, driverName);
     }
 
 
