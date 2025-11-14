@@ -1,4 +1,6 @@
-﻿public sealed class VulnManager : IDisposable
+﻿using System.Diagnostics;
+
+public sealed class VulnManager : IDisposable
 {
     private IntPtr _nativePtr;
     private bool _disposed;
@@ -10,11 +12,20 @@
     {
         if (string.IsNullOrWhiteSpace(driverPath)) throw new ArgumentNullException(nameof(driverPath));
         if (string.IsNullOrWhiteSpace(driverName)) throw new ArgumentNullException(nameof(driverName));
+        string fullDriverPath = Path.Combine(driverPath, driverName);
 
-        return NativeMethods.eTryLoadVuln(driverPath, driverName, out var ptr) && ptr != IntPtr.Zero
+        return NativeMethods.eTryLoadVuln(fullDriverPath, driverName, out var ptr) && ptr != IntPtr.Zero
             ? new VulnManager(ptr)
             : null;
     }
+
+    public static VulnManager? EasyCreate()
+    {
+        string driverPath = Environment.ProcessPath;
+        string driverName = "vuln";
+        return Create(driverPath, driverName);
+    }
+
 
     public static ulong GetKernelModuleAddress(string moduleName)
     {

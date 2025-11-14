@@ -5,7 +5,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        using (var driver = VulnManager.Create(@"C:\temp\vuln.sys", "vuln"))
+        using (var driver = VulnManager.EasyCreate())
         {
             if (driver == null)
             {
