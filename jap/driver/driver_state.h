@@ -12,10 +12,10 @@ typedef struct {
 
 	HANDLE hDevice;
 
-	uintptr_t win32k_base;
-	int NtUserSetGestureConfig_rva;
-	uintptr_t NtUserSetGestureConfig_ref;
-	uintptr_t NtUserSetGestureConfig_u;
+	uintptr_t swap_module_base;
+	int swap_rva;
+	uintptr_t swap_ref;
+	uintptr_t swap_u;
 
 	const wchar_t* vuln_driver_path;
 	const wchar_t* vuln_driver_name;

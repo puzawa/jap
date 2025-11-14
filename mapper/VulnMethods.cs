@@ -22,5 +22,15 @@ internal static class NativeMethods
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     internal static extern ulong eGetKernelModuleExport(IntPtr driverState, ulong kernelModuleBase, string functionName);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool eCallKernelFunction(
+    IntPtr driverState,
+    ulong functionAddress,
+    out ulong returnOut,
+    ulong argsCount,
+    ulong[] args
+);
 }
 

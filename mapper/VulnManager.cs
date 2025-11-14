@@ -37,6 +37,28 @@ public sealed class VulnManager : IDisposable
 
     }
 
+    public bool CallKernelFunction(ulong functionAddress, out ulong returnValue, params ulong[] arguments)
+    {
+        lock (_lock)
+        {
+            ThrowIfDisposed();
+
+            if (functionAddress == 0)
+                throw new ArgumentException("Invalid function address.", nameof(functionAddress));
+
+            if (arguments == null)
+                arguments = Array.Empty<ulong>();
+
+            return NativeMethods.eCallKernelFunction(
+                _nativePtr,
+                functionAddress,
+                out returnValue,
+                (ulong)arguments.Length,
+                arguments
+            );
+        }
+    }
+
     public ulong GetKernelModuleExport(ulong kernelModuleBase, string functionName)
     {
         lock (_lock)

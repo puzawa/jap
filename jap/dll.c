@@ -5,6 +5,26 @@
 #define DLL_EXPORT __declspec(dllexport)
 
 DLL_EXPORT
+bool eCallKernelFunction(
+	DriverState* driverState,
+	uintptr_t faddress,
+	uintptr_t* return_out, size_t args_count, uintptr_t* args
+)
+{
+	if (!driverState || !faddress) {
+		log_error("driverState/faddress cant be empty");
+		return false;
+	}
+	if ((args_count > 0) && !args)
+	{
+		log_error("invalid args");
+		return false;
+	}
+
+	return CallKernelFunction(driverState, faddress, return_out, args_count, args);
+}
+
+DLL_EXPORT
 bool eTryLoadVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, DriverState** pDriverState) {
 	if (!pDriverState) {
 		log_error("pDriverState cant be empty");
