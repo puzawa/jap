@@ -5,23 +5,18 @@ class Program
 {
     static void Main(string[] args)
     {
-        using (var vuln = VulnManager.EasyCreate())
+        using (var kc = new KCaller())
         {
-            if (vuln == null)
-            {
-                Console.WriteLine("Failed to load driver");
-                return;
-            }
+            Console.WriteLine("Calling ExAllocatePoolWithTag...");
 
-            var baseAddr = VulnManager.GetKernelModuleAddress("ntoskrnl.exe");
-            var exportAddr = vuln.GetKernelModuleExport(baseAddr, "ExAllocatePoolWithTag");
+            ulong result = kc.ExAllocatePoolWithTag(
+                poolType: 0,
+                size: 0x1000,
+                tag: 0xDEAD
+            );
 
-            Console.WriteLine("ExAllocatePoolWithTag exportAddr: " + exportAddr);
-
-            ulong ret = 0;
-            vuln.CallKernelFunction(exportAddr, out ret, 0, 0x1000, 0xDEAD);
-
-            Console.WriteLine("ExAllocatePoolWithTag ret: " + ret.ToString("X"));
+            Console.WriteLine("Allocated kernel memory at: 0x" + result.ToString("X"));
         }
+
     }
 }
