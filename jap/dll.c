@@ -1,4 +1,6 @@
 #include "utils/utils.h"
+#include "utils/pe/pe.h"
+
 #include "vuln/vuln.h"
 #include "driver/driver_interface.h"
 
@@ -51,6 +53,55 @@ uintptr_t eGetKernelModuleExport(DriverState* driverState, uint64_t kernel_modul
 		return 0;
 	}
 	return GetKernelModuleExport(driverState, kernel_module_base, function_name);
+}
+
+DLL_EXPORT
+PIMAGE_NT_HEADERS64 ePeGetNtHeaders(void* image_base) {
+	if (!image_base) {
+		log_error("ePeGetNtHeaders: image_base is NULL");
+		return NULL;
+	}
+	return PeGetNtHeaders(image_base);
+}
+
+DLL_EXPORT
+PeRelocVec ePeGetRelocs(void* image_base) {
+	PeRelocVec empty = { 0 };
+
+	if (!image_base) {
+		log_error("ePeGetRelocs: image_base is NULL");
+		return empty;
+	}
+	return PeGetRelocs(image_base);
+}
+
+DLL_EXPORT
+PeImportVec ePeGetImports(void* image_base) {
+	PeImportVec empty = { 0 };
+
+	if (!image_base) {
+		log_error("ePeGetImports: image_base is NULL");
+		return empty;
+	}
+	return PeGetImports(image_base);
+}
+
+DLL_EXPORT
+void ePeFreeImports(PeImportVec* imports) {
+	if (!imports) {
+		log_error("ePeFreeImports: imports pointer is NULL");
+		return;
+	}
+	PeFreeImports(imports);
+}
+
+DLL_EXPORT
+void ePeFreeRelocs(PeRelocVec* imports) {
+	if (!imports) {
+		log_error("ePeFreeRelocs: imports pointer is NULL");
+		return;
+	}
+	PeFreeRelocs(imports);
 }
 
 BOOL WINAPI DllMain(
