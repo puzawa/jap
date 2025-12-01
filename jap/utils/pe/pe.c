@@ -30,7 +30,7 @@ PeRelocVec PeGetRelocs(void* image_base) {
 		return relocs;
 
 	relocs.capacity = PE_INITIAL_CAPACITY;
-	relocs.relocs = (struct PeRelocInfo*)malloc(relocs.capacity * sizeof(struct PeRelocInfo));
+	relocs.relocs = (PeRelocInfo*)malloc(relocs.capacity * sizeof( PeRelocInfo));
 	if (!relocs.relocs)
 		return relocs;
 
@@ -40,15 +40,15 @@ PeRelocVec PeGetRelocs(void* image_base) {
 	while (current_base_relocation < reloc_end && current_base_relocation->SizeOfBlock) {
 		if (relocs.count == relocs.capacity) {
 			relocs.capacity *= 2;
-			void* new_mem = realloc(relocs.relocs, relocs.capacity * sizeof(struct PeRelocInfo));
+			void* new_mem = realloc(relocs.relocs, relocs.capacity * sizeof( PeRelocInfo));
 			if (!new_mem) {
 				PeFreeRelocs(&relocs);
 				return (PeRelocVec) { 0 };
 			}
-			relocs.relocs = (struct PeRelocInfo*)new_mem;
+			relocs.relocs = (PeRelocInfo*)new_mem;
 		}
 
-		struct PeRelocInfo* reloc_info = &relocs.relocs[relocs.count];
+		PeRelocInfo* reloc_info = &relocs.relocs[relocs.count];
 
 		reloc_info->address = (ULONG64)image_base + current_base_relocation->VirtualAddress;
 		reloc_info->item = (USHORT*)((ULONG64)current_base_relocation + sizeof(IMAGE_BASE_RELOCATION));
@@ -74,27 +74,27 @@ PeImportVec PeGetImports(void* image_base) {
 		return imports;
 
 	imports.capacity = PE_INITIAL_CAPACITY;
-	imports.imports = (struct PeImportInfo*)malloc(imports.capacity * sizeof(struct PeImportInfo));
+	imports.imports = (struct PeImportInfo*)malloc(imports.capacity * sizeof( PeImportInfo));
 	if (!imports.imports)
 		return imports;
 
-	memset(imports.imports, 0, imports.capacity * sizeof(struct PeImportInfo));
+	memset(imports.imports, 0, imports.capacity * sizeof( PeImportInfo));
 
 	PIMAGE_IMPORT_DESCRIPTOR current_import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)((ULONG64)image_base + import_va);
 
 	while (current_import_descriptor->FirstThunk) {
 		if (imports.count == imports.capacity) {
 			imports.capacity *= 2;
-			void* new_mem = realloc(imports.imports, imports.capacity * sizeof(struct PeImportInfo));
+			void* new_mem = realloc(imports.imports, imports.capacity * sizeof( PeImportInfo));
 			if (!new_mem) {
 				PeFreeImports(&imports);
 				return (PeImportVec) { 0 };
 			}
 			imports.imports = (struct PeImportInfo*)new_mem;
-			memset(&imports.imports[imports.count], 0, (imports.capacity / 2) * sizeof(struct PeImportInfo));
+			memset(&imports.imports[imports.count], 0, (imports.capacity / 2) * sizeof( PeImportInfo));
 		}
 
-		struct PeImportInfo* import_info = &imports.imports[imports.count];
+		PeImportInfo* import_info = &imports.imports[imports.count];
 
 		const char* module_name_src = (char*)((ULONG64)image_base + current_import_descriptor->Name);
 		size_t module_name_len = strlen(module_name_src) + 1;
@@ -106,12 +106,12 @@ PeImportVec PeGetImports(void* image_base) {
 		strcpy_s(import_info->module_name, module_name_len, module_name_src);
 
 		import_info->function_capacity = PE_INITIAL_CAPACITY;
-		import_info->function_datas = (struct PeImportFunctionInfo*)malloc(import_info->function_capacity * sizeof(struct PeImportFunctionInfo));
+		import_info->function_datas = (PeImportFunctionInfo*)malloc(import_info->function_capacity * sizeof( PeImportFunctionInfo));
 		if (!import_info->function_datas) {
 			PeFreeImports(&imports);
 			return (PeImportVec) { 0 };
 		}
-		memset(import_info->function_datas, 0, import_info->function_capacity * sizeof(struct PeImportFunctionInfo));
+		memset(import_info->function_datas, 0, import_info->function_capacity * sizeof(PeImportFunctionInfo));
 
 		PIMAGE_THUNK_DATA64 current_first_thunk = (PIMAGE_THUNK_DATA64)((ULONG64)image_base + current_import_descriptor->FirstThunk);
 		PIMAGE_THUNK_DATA64 current_originalFirstThunk = (PIMAGE_THUNK_DATA64)((ULONG64)image_base + current_import_descriptor->OriginalFirstThunk);
@@ -119,16 +119,16 @@ PeImportVec PeGetImports(void* image_base) {
 		while (current_originalFirstThunk->u1.Function) {
 			if (import_info->function_count == import_info->function_capacity) {
 				import_info->function_capacity *= 2;
-				void* new_mem = realloc(import_info->function_datas, import_info->function_capacity * sizeof(struct PeImportFunctionInfo));
+				void* new_mem = realloc(import_info->function_datas, import_info->function_capacity * sizeof(PeImportFunctionInfo));
 				if (!new_mem) {
 					PeFreeImports(&imports);
 					return (PeImportVec) { 0 };
 				}
-				import_info->function_datas = (struct PeImportFunctionInfo*)new_mem;
-				memset(&import_info->function_datas[import_info->function_count], 0, (import_info->function_capacity / 2) * sizeof(struct PeImportFunctionInfo));
+				import_info->function_datas = (PeImportFunctionInfo*)new_mem;
+				memset(&import_info->function_datas[import_info->function_count], 0, (import_info->function_capacity / 2) * sizeof(PeImportFunctionInfo));
 			}
 
-			struct PeImportFunctionInfo* func_data = &import_info->function_datas[import_info->function_count];
+			PeImportFunctionInfo* func_data = &import_info->function_datas[import_info->function_count];
 
 			PIMAGE_IMPORT_BY_NAME thunk_data = (PIMAGE_IMPORT_BY_NAME)((ULONG64)image_base + current_originalFirstThunk->u1.AddressOfData);
 
@@ -168,7 +168,7 @@ void PeFreeImports(PeImportVec* import_vec) {
 	if (!import_vec) return;
 
 	for (ULONG32 i = 0; i < import_vec->count; ++i) {
-		struct PeImportInfo* info = &import_vec->imports[i];
+		PeImportInfo* info = &import_vec->imports[i];
 
 		free(info->module_name);
 

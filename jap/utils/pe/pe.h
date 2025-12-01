@@ -1,37 +1,37 @@
 #pragma once
 #include <Windows.h>
 
-struct PeRelocInfo
+typedef struct 
 {
 	ULONG64 address;
 	USHORT* item;
 	ULONG32 count;
-};
+} PeRelocInfo;
 
-struct PeImportFunctionInfo
+typedef struct 
 {
 	char* name;
 	ULONG64* address;
-};
+}PeImportFunctionInfo;
 
-struct PeImportInfo
+typedef struct 
 {
-	char* module_name; 
-	struct PeImportFunctionInfo* function_datas;
+	char* module_name;
+	PeImportFunctionInfo* function_datas;
 	ULONG32 function_count;
 	ULONG32 function_capacity;
-};
+}PeImportInfo;
 
 typedef struct
 {
-	struct PeRelocInfo* relocs;
+	PeRelocInfo* relocs;
 	ULONG32 count;
 	ULONG32 capacity;
 } PeRelocVec;
 
 typedef struct
 {
-	struct PeImportInfo* imports;
+	PeImportInfo* imports;
 	ULONG32 count;
 	ULONG32 capacity;
 } PeImportVec;

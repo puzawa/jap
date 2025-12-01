@@ -153,6 +153,7 @@
     <ClCompile Include="utils\rxi\log.c" />
     <ClCompile Include="utils\service.c" />
     <ClCompile Include="utils\utils.c" />
+    <ClCompile Include="vuln\resolve_image.c" />
     <ClCompile Include="vuln\vuln.c" />
     <ClCompile Include="vuln\vuln_init.c" />
   </ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="utils\pe\pe.h" />
     <ClInclude Include="utils\rxi\log.h" />
     <ClInclude Include="utils\utils.h" />
+    <ClInclude Include="vuln\resolve_image.h" />
     <ClInclude Include="vuln\vuln.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
