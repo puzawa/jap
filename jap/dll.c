@@ -27,6 +27,16 @@ bool eCallKernelFunction(
 }
 
 DLL_EXPORT
+uintptr_t eMMapKernelPeImage(DriverState* driverState, BYTE* image_in) {
+	if (!driverState) {
+		log_error("driverState/faddress cant be empty");
+		return false;
+	}
+
+	return MMapKernelPeImage(driverState, image_in);
+}
+
+DLL_EXPORT
 bool eTryLoadVuln(const wchar_t* vuln_driver_path, const wchar_t* vuln_driver_name, DriverState** pDriverState) {
 	if (!pDriverState) {
 		log_error("pDriverState cant be empty");

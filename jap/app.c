@@ -13,6 +13,7 @@ int main() {
 	if (!TryLoadVuln(vuln_driver_path, vuln_driver_name, &driverState))
 		return 1;
 
+
 	uintptr_t ntos = GetKernelModuleAddress("ntoskrnl.exe");
 	if (ntos) {
 		log_info("ntos: %p", ntos);

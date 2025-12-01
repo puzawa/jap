@@ -13,3 +13,5 @@ bool CallKernelFunction(
 	uintptr_t faddress,
 	uintptr_t* return_out, size_t args_count, uintptr_t* args
 );
+
+PVOID MMapKernelPeImage(DriverState* driverState, BYTE* image_in);

@@ -1,12 +1,12 @@
 #include "vuln.h"
-
 #include "utils/pe/pe.h"
 #include "utils/utils.h"
 #include "driver/driver_loader.h"
 #include "driver/driver_interface.h"
 
+
 void RelocateImageByDelta(PeRelocVec relocs, const ULONG64 delta) {
-	for(int ri =0; ri < relocs.count; ri++)
+	for (int ri = 0; ri < relocs.count; ri++)
 	{
 		PeRelocInfo current_reloc = relocs.relocs[ri];
 
@@ -20,7 +20,7 @@ void RelocateImageByDelta(PeRelocVec relocs, const ULONG64 delta) {
 	}
 }
 
-bool ResolveImports(DriverState* driverState,PeImportVec imports) {
+bool ResolveImports(DriverState* driverState, PeImportVec imports) {
 	for (int ii = 0; ii < imports.count; ii++) {
 		PeImportInfo current_import = imports.imports[ii];
 		ULONG64 Module = GetKernelModuleAddress(current_import.module_name);
@@ -29,7 +29,7 @@ bool ResolveImports(DriverState* driverState,PeImportVec imports) {
 		}
 
 		for (int fi = 0; fi < current_import.function_count; fi++) {
-			PeImportFunctionInfo current_function_data =current_import.function_datas[fi];
+			PeImportFunctionInfo current_function_data = current_import.function_datas[fi];
 			ULONG64 function_address = GetKernelModuleExport(driverState, Module, current_function_data.name);
 
 			if (!function_address) {
@@ -41,10 +41,11 @@ bool ResolveImports(DriverState* driverState,PeImportVec imports) {
 					}
 				}
 			}
-
 			*current_function_data.address = function_address;
+
+			log_info("in %s resolved %s ptr: %p", current_import.module_name, current_function_data.name, function_address);
 		}
-		
+
 	}
 
 	return true;
@@ -81,18 +82,35 @@ bool FixSecurityCookie(BYTE* local_image, ULONG64 kernel_image_base)
 	return true;
 }
 
-bool ResolveKernelPeImage(DriverState* driverState, BYTE* data, uintptr_t kernel_image_base)
+PVOID ExAllocatePoolWithTag_ptr = 0;
+PVOID ExAllocatePoolWithTag(DriverState* driverState, int PoolType, SIZE_T NumberOfBytes, ULONG Tag) {
+
+	if (!ExAllocatePoolWithTag_ptr) {
+		uintptr_t ntosbase = GetKernelModuleAddress("ntoskrnl.exe");
+		ExAllocatePoolWithTag_ptr = GetKernelModuleExport(driverState, ntosbase, "ExAllocatePoolWithTag");
+	}
+
+	if (!ExAllocatePoolWithTag_ptr)
+		return 0;
+
+	uintptr_t args[3] = { PoolType, NumberOfBytes, Tag};
+	uintptr_t out = ExAllocatePoolWithTag_ptr;
+	CallKernelFunction(driverState, ExAllocatePoolWithTag_ptr, &out, 3, args);
+	return out;
+}
+
+PVOID MMapKernelPeImage(DriverState* driverState, BYTE* image_in)
 {
-	const PIMAGE_NT_HEADERS64 nt_headers = PeGetNtHeaders(data);
+	const PIMAGE_NT_HEADERS64 nt_headers = PeGetNtHeaders(image_in);
 
 	if (!nt_headers) {
 		log_error("invalid format of PE image");
-		return false;
+		return 0;
 	}
 
 	if (nt_headers->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
 		log_error("image is not 64 bit");
-		return false;
+		return 0;
 	}
 	ULONG32 image_size = nt_headers->OptionalHeader.SizeOfImage;
 
@@ -100,23 +118,36 @@ bool ResolveKernelPeImage(DriverState* driverState, BYTE* data, uintptr_t kernel
 	if (!local_image_base)
 		return 0;
 
-	memcpy(local_image_base, data, nt_headers->OptionalHeader.SizeOfHeaders);
+	memcpy(local_image_base, image_in, nt_headers->OptionalHeader.SizeOfHeaders);
 
 	const PIMAGE_SECTION_HEADER current_image_section = IMAGE_FIRST_SECTION(nt_headers);
 	for (auto i = 0; i < nt_headers->FileHeader.NumberOfSections; ++i) {
 		if ((current_image_section[i].Characteristics & IMAGE_SCN_CNT_UNINITIALIZED_DATA) > 0)
 			continue;
+
 		void* local_section = local_image_base + current_image_section[i].VirtualAddress;
-		memcpy(local_section, (void*)(data + current_image_section[i].PointerToRawData), current_image_section[i].SizeOfRawData);
+		memcpy(local_section, (void*)(image_in + current_image_section[i].PointerToRawData), current_image_section[i].SizeOfRawData);
 	}
 
-	ULONG64 realBase = kernel_image_base;
+	
+	uintptr_t kernel_image_base = ExAllocatePoolWithTag(driverState,0, image_size, 'enoN');
 	RelocateImageByDelta(PeGetRelocs(local_image_base), kernel_image_base - nt_headers->OptionalHeader.ImageBase);
-	if (!FixSecurityCookie(local_image_base, kernel_image_base)){
+	
+	//if (!FixSecurityCookie(local_image_base, kernel_image_base)) {
+	//	return 0;
+	//}
+
+	if (!ResolveImports(driverState, PeGetImports(local_image_base))) {
 		return 0;
 	}
 
-	if (!ResolveImports(driverState, PeGetImports(local_image_base))) {	
+	if (!WriteMemory(driverState, kernel_image_base, local_image_base, image_size)) {
 		return 0;
 	}
+
+	const uintptr_t address_of_entry_point = kernel_image_base + nt_headers->OptionalHeader.AddressOfEntryPoint;
+
+	free(local_image_base);
+	return address_of_entry_point;
+
 }
