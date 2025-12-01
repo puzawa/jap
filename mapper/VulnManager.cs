@@ -37,6 +37,23 @@ public sealed class VulnManager : IDisposable
 
     }
 
+    public ulong MMapKernelPeImage(
+        IntPtr imageIn)
+    {
+        lock (_lock)
+        {
+            ThrowIfDisposed();
+
+            if (imageIn == IntPtr.Zero)
+                throw new ArgumentException("imageIn cannot be zero.", nameof(imageIn));
+
+            return NativeMethods.eMMapKernelPeImage(
+                _nativePtr,
+                imageIn
+            );
+        }
+    }
+
     public bool CallKernelFunction(ulong functionAddress, out ulong returnValue, params ulong[] arguments)
     {
         lock (_lock)

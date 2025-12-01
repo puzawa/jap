@@ -58,6 +58,17 @@ public sealed class KCaller : IDisposable
         return CallExport("ExAllocatePoolWithTag", poolType, size, (KernelAddress)tag);
     }
 
+    public VulnManager Vuln
+    {
+        get
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(KCaller));
+
+            return _vuln;
+        }
+    }
+
     public void Dispose()
     {
         if (!_disposed)

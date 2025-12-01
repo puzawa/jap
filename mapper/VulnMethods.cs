@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 internal static class NativeMethods
 {
-    private const string DllName = "C:\\Users\\user\\source\\repos\\jap\\x64\\Release\\jap.dll";
+    private const string DllName = "jap.dll";
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern ulong eMMapKernelPeImage(IntPtr driverState, IntPtr image_in);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     internal static extern IntPtr ePeGetNtHeaders(IntPtr image_base);
@@ -29,11 +32,11 @@ internal static class NativeMethods
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool eCallKernelFunction(
-    IntPtr driverState,
-    ulong functionAddress,
-    out ulong returnOut,
-    ulong argsCount,
-    ulong[] args
-);
+        IntPtr driverState,
+        ulong functionAddress,
+        out ulong returnOut,
+        ulong argsCount,
+        ulong[] args
+    );
 }
 
