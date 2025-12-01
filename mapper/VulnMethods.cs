@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static PeWrapper.PeDef;
 
 internal static class NativeMethods
 {
@@ -12,18 +11,6 @@ internal static class NativeMethods
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     internal static extern IntPtr ePeGetNtHeaders(IntPtr image_base);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    internal static extern NativePeRelocVec ePeGetRelocs(IntPtr image_base);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void ePeFreeRelocs(ref NativePeRelocVec relocVec);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    internal static extern NativePeImportVec ePeGetImports(IntPtr image_base);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void ePeFreeImports(ref NativePeImportVec importVec);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.I1)]
