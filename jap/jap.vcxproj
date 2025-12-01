@@ -40,13 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -149,6 +149,7 @@
     <ClCompile Include="driver\driver_loader.c" />
     <ClCompile Include="dll.c" />
     <ClCompile Include="app.c" />
+    <ClCompile Include="utils\pe\pe.c" />
     <ClCompile Include="utils\rxi\log.c" />
     <ClCompile Include="utils\service.c" />
     <ClCompile Include="utils\utils.c" />
@@ -161,6 +162,7 @@
     <ClInclude Include="driver\driver_resource.h" />
     <ClInclude Include="driver\driver_state.h" />
     <ClInclude Include="utils\ntdef.h" />
+    <ClInclude Include="utils\pe\pe.h" />
     <ClInclude Include="utils\rxi\log.h" />
     <ClInclude Include="utils\utils.h" />
     <ClInclude Include="vuln\vuln.h" />

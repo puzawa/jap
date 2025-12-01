@@ -42,6 +42,9 @@
     <ClCompile Include="dll.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="utils\pe\pe.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver\driver_loader.h">
@@ -66,6 +69,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="vuln\vuln.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\pe\pe.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
