@@ -5,6 +5,16 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
+/// <summary>
+/// NativeMethods class provides P/Invoke declarations for interacting with the native DLL 
+/// that exports functions for loading vulnerable drivers, calling kernel functions, and mapping PE images.
+/// These methods wrap the native C functions like TryLoadVuln, UnloadVuln, etc.
+/// Assume the native DLL is named "vuln_loader.dll" (change if different).
+/// All strings are marshaled as LPWStr for wide characters, matching the C wchar_t*.
+/// Pointers are handled as IntPtr for DriverState*.
+/// Arrays are passed as IntPtr for manual marshaling if needed, but here params ulong[] is used.
+/// </summary>
 internal static class NativeMethods
 {
     private const string DllName = "jap.dll";
